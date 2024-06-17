@@ -1,0 +1,12 @@
+Gets data from the Cloudflare protected blog coderprog.com and posts messages to a private Telegram channel.
+
+To connect to Telegram API:
+
+Go to https://my.telegram.org/ -> login -> API Development tools -> Create new application.
+Get API ID and API hash.
+
+Create a bot with BotFather bot from Telegram and get the bot token.
+(The bot is optional but is needed to send messages to the private chat so the notification is generated and so the bubble with the number of unread messages can be seen)
+
+Create a private chat and go to it from a web browser and get its ID from the address.
+Paste the ID as numeric value in the code.
