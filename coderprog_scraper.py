@@ -1,13 +1,11 @@
-import time
 import datetime
 from dataclasses import dataclass
 
 import seleniumbase
-import selenium_stealth
-
 import pyquery
 
-# pip install seleniumbase selenium-stealth pyquery
+# pip install seleniumbase pyquery
+# seleniumbase 4.28.5
 
 HOST = 'https://coderprog.com'
 MAX_RETRIES = 3
@@ -51,16 +49,15 @@ def process_error_source(html):
     print('Error text not parsed. Check the page_dump.html.')
 
 
-def get_image(sb, url):
-  sb.open(url)
-  time.sleep(6)
+def get_image(selenium, url):
+  selenium.uc_open_with_reconnect(url, reconnect_time=2)
   
-  image = sb.find_element("img")
+  image = selenium.find_element("img")
   data = image.screenshot_as_png
   return data
 
-def process_page(sb, last_link):
-  html = sb.driver.page_source
+def process_page(selenium, last_link):
+  html = selenium.driver.page_source
   doc = pyquery.PyQuery(html)
   posts = doc('.latestPost')
   posts = list(posts.items())
@@ -99,13 +96,13 @@ def process_page(sb, last_link):
       print(f'\n-----------------------\nStop entry found: {date}, {link}\n---------------\n')
       return True
 
-    image = get_image(sb, image)
+    image = get_image(selenium, image)
     POST_DATA.append(Entry(title, link, date, image))
 
   return False
 
 
-def process(sb, last_link):
+def process(selenium, last_link):
   end_reached = False
   page = 1
   retries = 0
@@ -114,11 +111,11 @@ def process(sb, last_link):
     url = f'https://coderprog.com/page/{page}'
     print(f'Page {url}\n')
 
-    sb.open(url)
-    time.sleep(10)
+    selenium.uc_open_with_reconnect(url, reconnect_time=2)
+    selenium.uc_gui_click_cf()
     
     try:
-      end_reached = process_page(sb, last_link)
+      end_reached = process_page(selenium, last_link)
     
     except RetryParsing:
       retries += 1
@@ -131,17 +128,15 @@ def process(sb, last_link):
     page += 1
     retries = 0
     
-    if not end_reached:
-      time.sleep(2)
     print()
 
   print(f' ______\n|\n|Found {len(POST_DATA)} entries after the last posted\n|\n ‾‾‾‾‾‾')
 
 
 def run(last_link: str | None) -> list[Entry]:
-  with seleniumbase.SB(uc=True, headless='new', agent=user_agent) as sb:
+  with seleniumbase.SB(uc=True, agent=user_agent) as selenium:
     try:
-      process(sb, last_link)
+      process(selenium, last_link)
     except WrongPageSource:
       pass
     except Finish:
@@ -151,4 +146,7 @@ def run(last_link: str | None) -> list[Entry]:
 
 
 if __name__ == '__main__':
-  run(None)
+  data = run(None)
+  with open('data_dump.json', 'w') as f:
+    for item in data:
+      f.write(item.__dict__)

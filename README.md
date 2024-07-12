@@ -10,3 +10,6 @@ Create a bot with BotFather bot from Telegram and get the bot token.
 
 Create a private chat, open it from a web browser and get its ID from the URL.
 Paste the ID as numeric value in the code.
+
+**Notes**
+- using seleniumbase 4.28.5 for handling Cloudflare captchas, the browser has to be opened in window mode and focused so the captcha can be clicked (only on the first page load)
