@@ -16,6 +16,7 @@ class Entry:
   title: str
   link: str
   date: datetime.date
+  type: str
   image: bytes
 
 class WrongPageSource(Exception):
@@ -69,6 +70,7 @@ def process_page(selenium, last_link):
 
   for post in posts:
     header = post.find('.title a')
+    
     title = header.text().strip()
     link = header.attr.href
     date = post.find('.post-info .date').text().strip()
@@ -76,14 +78,26 @@ def process_page(selenium, last_link):
     image = HOST + post.find('img').attr.src
 
     print(f'title: {title}, link: {link}, date {date}, image {image}')
+    
+    type = ''
 
     full_post = post.find('.full-post')
     if full_post:
-      text = full_post.text().lower()
-      is_video = 'pdf' not in text and 'epub' not in text
+      text = full_post.text()
+      is_pdf = 'PDF' in text
+      is_epub = 'EPUB' in text
+      is_video = not is_pdf and not is_pdf
+      
       if is_video:
-        print('[ Found video, skipping ]')
+        print('[ Found video, skipping ]\n')
         continue
+      
+      types = []
+      if is_pdf:
+        types.append('PDF')
+      if is_epub:
+        types.append('EPUB')
+      type = ', '.join(types)
 
     stop_process = False
     if last_link:
