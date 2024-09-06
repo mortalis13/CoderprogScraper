@@ -5,7 +5,7 @@ from telethon import TelegramClient, events, sync
 
 import coderprog_scraper as scraper
 
-# pip install telethon
+# pip install -U telethon
 
 
 CHANNEL_CHAT_ID = -1001111111111

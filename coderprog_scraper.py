@@ -4,8 +4,9 @@ from dataclasses import dataclass
 import seleniumbase
 import pyquery
 
-# pip install seleniumbase pyquery
+# pip install -U seleniumbase pyquery
 # seleniumbase 4.28.5
+# seleniumbase 4.30.3
 
 HOST = 'https://coderprog.com'
 MAX_RETRIES = 3
@@ -111,7 +112,7 @@ def process_page(selenium, last_link):
       return True
 
     image = get_image(selenium, image)
-    POST_DATA.append(Entry(title, link, date, image))
+    POST_DATA.append(Entry(title, link, date, type, image))
 
   return False
 
@@ -120,13 +121,13 @@ def process(selenium, last_link):
   end_reached = False
   page = 1
   retries = 0
-
+  
   while not end_reached:
     url = f'https://coderprog.com/page/{page}'
     print(f'Page {url}\n')
 
-    selenium.uc_open_with_reconnect(url, reconnect_time=2)
-    selenium.uc_gui_click_cf()
+    selenium.uc_open_with_reconnect(url, 4)
+    selenium.uc_gui_click_captcha()
     
     try:
       end_reached = process_page(selenium, last_link)
@@ -148,7 +149,7 @@ def process(selenium, last_link):
 
 
 def run(last_link: str | None) -> list[Entry]:
-  with seleniumbase.SB(uc=True, agent=user_agent) as selenium:
+  with seleniumbase.SB(uc=True) as selenium:
     try:
       process(selenium, last_link)
     except WrongPageSource:
