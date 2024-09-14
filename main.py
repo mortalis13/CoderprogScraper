@@ -54,7 +54,7 @@ def main():
   sent = 0
   
   for item in reversed(data):
-    text = f'{item.title}\n{item.link}\n{item.date}\n\n- - - - - - - - - - - - - - - - - -\n'
+    text = f'{item.title}\n{item.link}\n{item.date}\n{item.type}\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n'
     
     # Workaround from https://github.com/LonamiWebs/Telethon/issues/1473
     image_wrapper = io.BytesIO(item.image)

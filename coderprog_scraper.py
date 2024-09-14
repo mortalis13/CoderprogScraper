@@ -26,6 +26,9 @@ class WrongPageSource(Exception):
 class Finish(Exception):
   pass
 
+class ErrorExit(Exception):
+  pass
+
 class RetryParsing(Exception):
   pass
 
@@ -34,7 +37,7 @@ user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 
 
 def process_error_source(html):
-  print('Prasing error page')
+  print('Parsing error page')
   with open('page_dump.html', 'w') as f:
     f.write(html)
 
@@ -149,15 +152,23 @@ def process(selenium, last_link):
 
 
 def run(last_link: str | None) -> list[Entry]:
-  with seleniumbase.SB(uc=True) as selenium:
-    try:
-      process(selenium, last_link)
-    except WrongPageSource:
-      pass
-    except Finish:
-      pass
+  try:
+    with seleniumbase.SB(uc=True) as selenium:
+      try:
+        process(selenium, last_link)
 
+      except WrongPageSource:
+        pass
+      except Finish:
+        pass
+      except KeyboardInterrupt:
+        print('Requested stop')
+        raise
+  
     return POST_DATA
+  
+  except KeyboardInterrupt:
+    return None
 
 
 if __name__ == '__main__':
