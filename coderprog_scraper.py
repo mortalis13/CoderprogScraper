@@ -12,6 +12,10 @@ HOST = 'https://coderprog.com'
 MAX_RETRIES = 3
 POST_DATA = []
 
+CLICK_CAPTCHA = True
+CLICK_CAPTCHA = False
+
+
 @dataclass
 class Entry:
   title: str
@@ -20,20 +24,13 @@ class Entry:
   type: str
   image: bytes
 
-class WrongPageSource(Exception):
-  pass
+class WrongPageSource(Exception): pass
 
-class Finish(Exception):
-  pass
+class Finish(Exception): pass
 
-class ErrorExit(Exception):
-  pass
+class ErrorExit(Exception): pass
 
-class RetryParsing(Exception):
-  pass
-
-
-user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.6167.140 Safari/537.36"
+class RetryParsing(Exception): pass
 
 
 def process_error_source(html):
@@ -48,6 +45,7 @@ def process_error_source(html):
   doc = pyquery.PyQuery(html)
   error_text = doc.find('#cf-error-details span.inline-block')
   error_code = doc.find('#cf-error-details span.code-label')
+  
   if error_text and error_code:
     print(f'{error_text.text()} ({error_code.text()})')
   else:
@@ -55,11 +53,12 @@ def process_error_source(html):
 
 
 def get_image(selenium, url):
-  selenium.uc_open_with_reconnect(url, reconnect_time=2)
-  
+  selenium.uc_open_with_reconnect(url, 2)
+    
   image = selenium.find_element("img")
   data = image.screenshot_as_png
   return data
+
 
 def process_page(selenium, last_link):
   html = selenium.driver.page_source
@@ -83,7 +82,7 @@ def process_page(selenium, last_link):
 
     print(f'title: {title}, link: {link}, date {date}, image {image}')
     
-    type = ''
+    type_ = ''
 
     full_post = post.find('.full-post')
     if full_post:
@@ -101,7 +100,7 @@ def process_page(selenium, last_link):
         types.append('PDF')
       if is_epub:
         types.append('EPUB')
-      type = ', '.join(types)
+      type_ = ', '.join(types)
 
     stop_process = False
     if last_link:
@@ -115,7 +114,7 @@ def process_page(selenium, last_link):
       return True
 
     image = get_image(selenium, image)
-    POST_DATA.append(Entry(title, link, date, type, image))
+    POST_DATA.append(Entry(title, link, date, type_, image))
 
   return False
 
@@ -130,7 +129,12 @@ def process(selenium, last_link):
     print(f'Page {url}\n')
 
     selenium.uc_open_with_reconnect(url, 4)
-    selenium.uc_gui_click_captcha()
+    
+    captcha_visible = selenium.is_text_visible('Verify you are human by completing the action below')
+    print(f'Captcha is visible: {captcha_visible}')
+    if captcha_visible or CLICK_CAPTCHA:
+      selenium.uc_gui_handle_captcha()  # Tab + Space
+      # selenium.uc_gui_click_captcha()  # Mouse click
     
     try:
       end_reached = process_page(selenium, last_link)
@@ -157,10 +161,8 @@ def run(last_link: str | None) -> list[Entry]:
       try:
         process(selenium, last_link)
 
-      except WrongPageSource:
-        pass
-      except Finish:
-        pass
+      except WrongPageSource: pass
+      except Finish: pass
       except KeyboardInterrupt:
         print('Requested stop')
         raise
@@ -173,6 +175,8 @@ def run(last_link: str | None) -> list[Entry]:
 
 if __name__ == '__main__':
   data = run(None)
+  if not data: exit()
+
   with open('data_dump.json', 'w') as f:
     for item in data:
-      f.write(item.__dict__)
+      f.write(f'{item.title} {item.link} {item.date} {item.type}\n')
