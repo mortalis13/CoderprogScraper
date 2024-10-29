@@ -7,13 +7,11 @@ import pyquery
 # pip install -U seleniumbase pyquery
 # seleniumbase 4.28.5
 # seleniumbase 4.30.3
+# seleniumbase 4.32.4
 
 HOST = 'https://coderprog.com'
 MAX_RETRIES = 3
 POST_DATA = []
-
-CLICK_CAPTCHA = True
-CLICK_CAPTCHA = False
 
 
 @dataclass
@@ -129,12 +127,8 @@ def process(selenium, last_link):
     print(f'Page {url}\n')
 
     selenium.uc_open_with_reconnect(url, 4)
-    
-    captcha_visible = selenium.is_text_visible('Verify you are human by completing the action below')
-    print(f'Captcha is visible: {captcha_visible}')
-    if captcha_visible or CLICK_CAPTCHA:
-      selenium.uc_gui_handle_captcha()  # Tab + Space
-      # selenium.uc_gui_click_captcha()  # Mouse click
+    selenium.uc_gui_handle_captcha()  # Tab + Space
+    # selenium.uc_gui_click_captcha()  # Mouse click
     
     try:
       end_reached = process_page(selenium, last_link)
