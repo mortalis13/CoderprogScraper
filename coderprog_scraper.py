@@ -8,6 +8,7 @@ import pyquery
 # seleniumbase 4.28.5
 # seleniumbase 4.30.3
 # seleniumbase 4.32.4
+# seleniumbase 4.32.12
 
 HOST = 'https://coderprog.com'
 MAX_RETRIES = 3
