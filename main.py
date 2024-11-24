@@ -54,14 +54,14 @@ def main():
   sent = 0
   
   for item in reversed(data):
-    text = f'{item.title}\n{item.link}\n{item.date}\n{item.type}\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n'
+    text = f'[{sent+1}/{total}] {item.title}\n{item.link}\n{item.date}\n{item.type}\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n'
     
     # Workaround from https://github.com/LonamiWebs/Telethon/issues/1473
     image_wrapper = io.BytesIO(item.image)
     image_wrapper.name = 'post.png'
     bot.send_file(CHANNEL_CHAT_ID, image_wrapper, caption=text)
     
-    print(f'Message sent for "{item.title}"')
+    print(f'[{sent+1}/{total}] Message sent for "{item.title}"')
     sent += 1
     time.sleep(1)
   
