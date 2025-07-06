@@ -90,11 +90,6 @@ def process_page(selenium, last_link):
       text = full_post.text()
       is_pdf = 'PDF' in text
       is_epub = 'EPUB' in text
-      is_video = not is_pdf and not is_pdf
-      
-      if is_video:
-        print('[ Found video, skipping ]\n')
-        continue
       
       types = []
       if is_pdf:
@@ -127,7 +122,7 @@ def process(selenium, last_link):
   retries = 0
   
   while not end_reached:
-    url = f'https://coderprog.com/page/{page}'
+    url = f'https://coderprog.com/category/books/page/{page}'
     print(f'Page {url}\n')
 
     selenium.uc_open_with_reconnect(url, 4)
