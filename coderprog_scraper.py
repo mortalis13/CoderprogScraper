@@ -20,8 +20,9 @@ class Entry:
   title: str
   link: str
   date: datetime.date
-  type: str
   image: bytes
+  type: str = None
+
 
 class WrongPageSource(Exception): pass
 
@@ -77,7 +78,8 @@ def process_page(selenium, last_link):
     link = header.attr.href
     date = post.find('.post-info .date').text().strip()
     date = datetime.datetime.strptime(date, '%B %d, %Y').date()
-    image = HOST + post.find('img').attr.src
+    image = post.find('img').attr.src
+    image = image if image.startswith(HOST) else HOST + image
 
     print(f'title: {title}, link: {link}, date {date}, image {image}')
     
@@ -107,13 +109,14 @@ def process_page(selenium, last_link):
 
     else:
       stop_process = POST_DATA and POST_DATA[0].date != date
+      # stop_process = date.month != datetime.datetime.today().month
 
     if stop_process:
       print(f'\n-----------------------\nStop entry found: {date}, {link}\n---------------\n')
       return True
 
-    image = get_image(selenium, image)
-    POST_DATA.append(Entry(title, link, date, type_, image))
+    image = None  # get_image(selenium, image)
+    POST_DATA.append(Entry(title, link, date, image, type_))
 
   return False
 

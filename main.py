@@ -51,15 +51,22 @@ def main():
     return
   
   print('\nStart sending posts\n')
+  total = len(data)
   sent = 0
   
   for item in reversed(data):
-    text = f'[{sent+1}/{total}] {item.title}\n{item.link}\n{item.date}\n{item.type}\n\n- - - - - - - - - - - - - - - - - - - - - - - - -\n'
+    item_type = item.type + '\n' if item.type else ''
+    text = f'{item.title}\n{item.link}\n{item.date}\n{item_type}- - - - - - - - - - - - - - - - - - - - - - - - -\n'
     
-    # Workaround from https://github.com/LonamiWebs/Telethon/issues/1473
-    image_wrapper = io.BytesIO(item.image)
-    image_wrapper.name = 'post.png'
-    bot.send_file(CHANNEL_CHAT_ID, image_wrapper, caption=text)
+    if item.image:
+      # Workaround from https://github.com/LonamiWebs/Telethon/issues/1473
+      image_wrapper = io.BytesIO(item.image)
+      image_wrapper.name = 'post.png'
+      bot.send_file(CHANNEL_CHAT_ID, image_wrapper, caption=text)
+    
+    else:
+      bot.send_message(CHANNEL_CHAT_ID, text)
+      
     
     print(f'[{sent+1}/{total}] Message sent for "{item.title}"')
     sent += 1
