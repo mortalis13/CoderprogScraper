@@ -126,8 +126,12 @@ def process(selenium, last_link):
     print(f'Page {url}\n')
 
     selenium.uc_open_with_reconnect(url, 4)
-    selenium.uc_gui_handle_captcha()  # Tab + Space
+    # selenium.uc_gui_handle_captcha()  # Tab + Space
     # selenium.uc_gui_click_captcha()  # Mouse click
+    
+    if page == 1:
+      print('--> Resolve captcha (30s)')
+      selenium.sleep(30)  # Click captcha manually
     
     try:
       end_reached = process_page(selenium, last_link)
