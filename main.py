@@ -7,7 +7,6 @@ import coderprog_scraper as scraper
 
 # pip install -U telethon
 
-
 CHANNEL_CHAT_ID = -1001111111111
 BOT_TOKEN = ''
 
@@ -15,13 +14,12 @@ API_ID = 0
 API_HASH = ''
 
 
-client = TelegramClient('client_session', API_ID, API_HASH).start()
-bot = TelegramClient('bot_session', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
-
-
 def find_last_link():
+  client = TelegramClient('client_session', API_ID, API_HASH).start()
+  
   print('Getting the last posted link')
   messages = client.get_messages(CHANNEL_CHAT_ID, 1)
+  client.disconnect()
 
   last_link = None
   if messages and messages[0].message:
@@ -45,7 +43,7 @@ def main():
     print(f'\nStart getting data until the last processed entry with link: {last_link}\n')
   else:
     print(f'\nStart getting data for the last available day\n')
-
+  
   data = scraper.run(last_link)
   if not data:
     return
@@ -54,6 +52,7 @@ def main():
   total = len(data)
   sent = 0
   
+  bot = TelegramClient('bot_session', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
   for item in reversed(data):
     item_type = item.type + '\n' if item.type else ''
     text = f'{item.title}\n{item.link}\n{item.date}\n{item_type}- - - - - - - - - - - - - - - - - - - - - - - - -\n'
@@ -66,7 +65,6 @@ def main():
     
     else:
       bot.send_message(CHANNEL_CHAT_ID, text)
-      
     
     print(f'[{sent+1}/{total}] Message sent for "{item.title}"')
     sent += 1
