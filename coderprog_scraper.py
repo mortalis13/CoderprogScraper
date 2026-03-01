@@ -1,3 +1,4 @@
+import time
 import datetime
 from dataclasses import dataclass
 
@@ -5,10 +6,6 @@ import seleniumbase
 import pyquery
 
 # pip install -U seleniumbase pyquery
-# seleniumbase 4.28.5
-# seleniumbase 4.30.3
-# seleniumbase 4.32.4
-# seleniumbase 4.32.12
 
 HOST = 'https://coderprog.com'
 MAX_RETRIES = 3
@@ -107,7 +104,7 @@ def process_page(selenium, last_link):
       # stop_process = date.month != datetime.datetime.today().month
 
     if stop_process:
-      print(f'\n-----------------------\nStop entry found: {date}, {link}\n---------------\n')
+      print(f'\n-----------------------\nStop entry found: {date}, {link}\n-----------------------\n')
       return True
 
     image = None  # get_image(selenium, image)
@@ -126,12 +123,12 @@ def process(selenium, last_link):
     print(f'Page {url}\n')
 
     selenium.uc_open_with_reconnect(url, 4)
-    # selenium.uc_gui_handle_captcha()  # Tab + Space
-    # selenium.uc_gui_click_captcha()  # Mouse click
     
     if page == 1:
-      print('--> Resolve captcha (30s)')
-      selenium.sleep(30)  # Click captcha manually
+      print('Waiting for captcha...\n')
+      selenium.sleep(10)
+    
+    t = time.time()
     
     try:
       end_reached = process_page(selenium, last_link)
@@ -143,18 +140,19 @@ def process(selenium, last_link):
         raise Finish()
       continue
       
-    print('Parsing done')
+    print(f'\nParsing done in {time.time() - t:.2f} s')
+    
     page += 1
     retries = 0
     
     print()
 
-  print(f' ______\n|\n|Found {len(POST_DATA)} entries after the last posted\n|\n ‾‾‾‾‾‾')
+  print(f' __________________\n|\n| Found {len(POST_DATA)} entries after the last posted\n|\n ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
 
 def run(last_link: str | None) -> list[Entry]:
   try:
-    with seleniumbase.SB(uc=True) as selenium:
+    with seleniumbase.SB(uc=True, headless='new') as selenium:
       try:
         process(selenium, last_link)
 

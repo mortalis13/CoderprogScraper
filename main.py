@@ -55,7 +55,7 @@ def main():
   bot = TelegramClient('bot_session', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
   for item in reversed(data):
     item_type = item.type + '\n' if item.type else ''
-    text = f'{item.title}\n{item.link}\n{item.date}\n{item_type}- - - - - - - - - - - - - - - - - - - - - - - - -\n'
+    text = f'{item.title}\n{item.link}\n{item.date}\n{item_type}'
     
     if item.image:
       # Workaround from https://github.com/LonamiWebs/Telethon/issues/1473
@@ -70,7 +70,7 @@ def main():
     sent += 1
     time.sleep(1)
   
-  print(f'\nSent {sent} messages\n')
+  print(f'\nSent {sent} messages')
   
 
 main()
