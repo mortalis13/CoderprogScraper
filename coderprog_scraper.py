@@ -101,7 +101,6 @@ def process_page(selenium, last_link):
 
     else:
       stop_process = POST_DATA and POST_DATA[0].date != date
-      # stop_process = date.month != datetime.datetime.today().month
 
     if stop_process:
       print(f'\n-----------------------\nStop entry found: {date}, {link}\n-----------------------\n')
@@ -121,14 +120,13 @@ def process(selenium, last_link):
   while not end_reached:
     url = f'https://coderprog.com/category/books/page/{page}'
     print(f'Page {url}\n')
+    t = time.time()
 
     selenium.uc_open_with_reconnect(url, 4)
     
     if page == 1:
       print('Waiting for captcha...\n')
       selenium.sleep(10)
-    
-    t = time.time()
     
     try:
       end_reached = process_page(selenium, last_link)
@@ -147,7 +145,7 @@ def process(selenium, last_link):
     
     print()
 
-  print(f' __________________\n|\n| Found {len(POST_DATA)} entries after the last posted\n|\n ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
+  print(f' _________________\n|\n| Found {len(POST_DATA)} entries after the last posted\n|\n ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾')
 
 
 def run(last_link: str | None) -> list[Entry]:
