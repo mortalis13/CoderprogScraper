@@ -6,6 +6,8 @@ import seleniumbase
 import pyquery
 
 # pip install -U seleniumbase pyquery
+# -- Get drivers for Chrome for Testing: https://seleniumbase.io/help_docs/webdriver_installation
+# sbase get cft
 
 HOST = 'https://coderprog.com'
 MAX_RETRIES = 3
@@ -150,7 +152,7 @@ def process(selenium, last_link):
 
 def run(last_link: str | None) -> list[Entry]:
   try:
-    with seleniumbase.SB(uc=True, headless='new') as selenium:
+    with seleniumbase.SB(uc=True, binary_location='cft') as selenium:
       try:
         process(selenium, last_link)
 
