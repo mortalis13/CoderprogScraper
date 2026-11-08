@@ -12,9 +12,19 @@ Or use the `GetIDs Bot`.
 Save the chat ID to `CHANNEL_CHAT_ID` in `main.py`.
 
 ## Usage
-Preferably use from a venv to avoid conflicts and independently update the core libraries
+Preferably run from a venv to avoid conflicts and independently update the core libraries
 - Run on every usage `pip install -U seleniumbase`, to have the latest version, that would have the updated handling of Cloudflare captchas/restrictions
 - `python main.py`
 - Check the pages are being parsed and the data is sent to Telegram after that
 - On the next run the script would take the latest entry saved and would start the parsing from that entry
 - Remove `headless='new'` parameter if a page cannot be parsed (check the `page_dump.html` for errors), and resolve the captcha manually if needed
+
+### Automated Run
+*Windows*
+```
+cd /d c:\CoderprogScraper
+python -m pip install --upgrade pip
+python -m venv %cd%\venv
+pip install -U seleniumbase pyquery
+cmd /k python main.py
+```
